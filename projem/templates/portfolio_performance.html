@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portföy Performans Takibi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+            padding: 40px 20px; 
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(20px); 
+            padding: 40px; 
+            border-radius: 24px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+        }
+        h1 { 
+            color: #1a1a2e; 
+            font-size: 2.5em; 
+            font-weight: 700; 
+            margin-bottom: 10px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+        .subtitle { color: #666; font-size: 1.1em; margin-bottom: 40px; }
+        .nav { margin-bottom: 30px; }
+        .nav a { 
+            display: inline-block; 
+            padding: 10px 20px; 
+            background: #667eea; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            margin-right: 10px; 
+        }
+        .nav a:hover { background: #5568d3; }
+        .general-stats { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            padding: 30px; 
+            border-radius: 16px; 
+            margin-bottom: 30px; 
+            color: white; 
+        }
+        .general-stats h2 { margin-bottom: 20px; }
+        .stat-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 20px; 
+        }
+        .stat-card { 
+            background: rgba(255,255,255,0.2); 
+            padding: 20px; 
+            border-radius: 12px; 
+        }
+        .stat-value { font-size: 2em; font-weight: bold; }
+        .stat-label { font-size: 0.9em; opacity: 0.9; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+        }
+        th { 
+            background: #667eea; 
+            color: white; 
+            padding: 12px; 
+            text-align: left; 
+        }
+        td { 
+            padding: 12px; 
+            border-bottom: 1px solid #e0e0e0; 
+        }
+        tr:hover { background: #f5f5f5; }
+        .correct { color: #4caf50; font-weight: bold; }
+        .incorrect { color: #f44336; font-weight: bold; }
+        .positive { color: #4caf50; }
+        .negative { color: #f44336; }
+        .loading { text-align: center; padding: 40px; font-size: 1.2em; color: #666; }
+        .error { 
+            background: #ffebee; 
+            color: #c62828; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin: 20px 0; 
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .weights-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .weights-btn:hover {
+            background: #5568d3;
+        }
+        .weights-detail-row {
+            display: none;
+        }
+        .weights-detail-row.show {
+            display: table-row;
+        }
+        .weights-container {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 2px solid #667eea;
+        }
+        .weights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .weight-card {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .weight-card.high {
+            border-left-color: #4caf50;
+            background: linear-gradient(90deg, #e8f5e9 0%, white 20%);
+        }
+        .weight-ticker {
+            font-weight: 700;
+            font-size: 0.95em;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        .weight-value {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .weights-summary {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+        }
+        .weights-summary h4 {
+            margin: 0 0 10px 0;
+            color: #1a1a2e;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="/">Ana Sayfa</a>
+            <a href="/compare">MPT vs AI/ML</a>
+            <a href="/forecast_summary">Bireysel Hisse Performansı</a>
+        </div>
+        
+        <h1>📊 Portföy Performans Takibi</h1>
+        <p class="subtitle">Modelinizin portföy seviyesindeki tahmin performansı</p>
+        
+        <div class="info-box">
+            <strong>ℹ️ Bu sayfa portföy seviyesinde performansı gösterir.</strong><br>
+            Model bireysel hisse tahminlerini kullanarak optimal portföy oluşturur ve portföyün gerçekleşen getirisini takip eder.
+            Bu, projenizin asıl amacına (portföy optimizasyonu) daha uygundur.
+        </div>
+        
+        <div id="loading" class="loading">⏳ Yükleniyor...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <div id="generalStats" style="display: none;"></div>
+        <div id="detailsTable"></div>
+    </div>
+
+    <script>
+        async function loadPortfolioPerformance() {
+            try {
+                const response = await fetch('/api/portfolio_performance');
+                const data = await response.json();
+                
+                document.getElementById('loading').style.display = 'none';
+                
+                if (!data.success) {
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error').textContent = data.message || 'Veri yüklenemedi.';
+                    return;
+                }
+                
+                // Genel istatistikler
+                const general = data.general;
+                let alphaHtml = '';
+                if (general.avg_alpha !== null) {
+                    const alphaClass = general.avg_alpha > 0 ? 'positive' : 'negative';
+                    alphaHtml = `
+                        <div class="stat-card">
+                            <div class="stat-value ${alphaClass}">${general.avg_alpha > 0 ? '+' : ''}${general.avg_alpha}%</div>
+                            <div class="stat-label">Ortalama Alpha (vs Benchmark)</div>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('generalStats').innerHTML = `
+                    <div class="general-stats">
+                        <h2>📈 Portföy Performans Özeti</h2>
+                        <div class="stat-grid">
+                            <div class="stat-card">
+                                <div class="stat-value">${general.total_forecasts}</div>
+                                <div class="stat-label">Toplam Portföy Tahmini</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">${general.overall_success_rate}%</div>
+                                <div class="stat-label">Alpha Yön Doğruluğu (Benchmark)</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">${general.correct_predictions}</div>
+                                <div class="stat-label">Doğru Tahmin</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">%${general.avg_error}</div>
+                                <div class="stat-label">Ortalama Hata</div>
+                            </div>
+                            ${alphaHtml}
+                        </div>
+                    </div>
+                `;
+                document.getElementById('generalStats').style.display = 'block';
+                
+                // Detaylı tablo
+                if (data.details && data.details.length > 0) {
+                    let tableHtml = '<h3 style="margin-top: 30px; margin-bottom: 15px;">Portföy Tahminleri</h3>';
+                    tableHtml += '<table>';
+                    tableHtml += '<thead><tr><th>Tarih</th><th>Portföy Tahmini</th><th>Portföy Gerçekleşen</th><th>Fark</th><th>Benchmark</th><th>Alpha</th><th>Piyasa Yönü</th><th>Benchmark Geçildi mi?</th><th>Alpha Yönü</th><th>Durum</th><th>Ağırlıklar</th></tr></thead><tbody>';
+                    
+                    for (let idx = 0; idx < data.details.length; idx++) {
+                        const detail = data.details[idx];
+                        const isPending = detail.status === 'pending';
+                        const marketDirectionClass = detail.market_direction_correct !== null ? (detail.market_direction_correct ? 'correct' : 'incorrect') : '';
+                        const marketDirectionText = detail.market_direction_correct !== null ? (detail.market_direction_correct ? 'DOGRU' : 'YANLIS') : '-';
+                        const beatBenchmarkClass = detail.beat_benchmark !== null ? (detail.beat_benchmark ? 'correct' : 'incorrect') : '';
+                        const beatBenchmarkText = detail.beat_benchmark !== null ? (detail.beat_benchmark ? 'EVET' : 'HAYIR') : '-';
+                        const directionClass = detail.direction_correct !== null ? (detail.direction_correct ? 'correct' : 'incorrect') : '';
+                        const directionText = detail.direction_correct !== null ? (detail.direction_correct ? 'ALPHA DOGRU' : 'ALPHA YANLIS') : '-';
+                        const predictedClass = detail.predicted > 0 ? 'positive' : 'negative';
+                        const actualClass = detail.actual !== null ? (detail.actual > 0 ? 'positive' : 'negative') : '';
+                        const alphaClass = detail.alpha !== null && detail.alpha > 0 ? 'positive' : 'negative';
+                        const statusText = isPending ? `<span style="color: #ff9800; font-weight: bold;">BEKLIYOR (${detail.horizon} gun)</span>` : '<span style="color: #4caf50; font-weight: bold;">TAMAMLANDI</span>';
+                        const hasWeights = detail.weights && Object.keys(detail.weights).length > 0;
+                        
+                        tableHtml += `<tr style="${isPending ? 'background: #fff3e0;' : ''}" id="row-${idx}">
+                            <td>${detail.date}</td>
+                            <td class="${predictedClass}">${detail.predicted > 0 ? '+' : ''}${detail.predicted}%</td>
+                            <td class="${actualClass}">${detail.actual !== null ? (detail.actual > 0 ? '+' : '') + detail.actual + '%' : '<em>Henüz gerçekleşmedi</em>'}</td>
+                            <td>${detail.error !== null ? detail.error + '%' : '-'}</td>
+                            <td>${detail.benchmark !== null ? (detail.benchmark > 0 ? '+' : '') + detail.benchmark + '%' : '-'}</td>
+                            <td class="${alphaClass}">${detail.alpha !== null ? (detail.alpha > 0 ? '+' : '') + detail.alpha + '%' : '-'}</td>
+                            <td class="${marketDirectionClass}">${marketDirectionText}</td>
+                            <td class="${beatBenchmarkClass}">${beatBenchmarkText}</td>
+                            <td class="${directionClass}">${directionText}</td>
+                            <td>${statusText}</td>
+                            <td>${hasWeights ? `<button class="weights-btn" onclick="toggleWeights(${idx})" id="btn-${idx}">Göster</button>` : '<em>Yok</em>'}</td>
+                        </tr>`;
+                        
+                        // Ağırlıklar için genişletilebilir satır
+                        if (hasWeights) {
+                            const weightsArray = Object.entries(detail.weights)
+                                .map(([ticker, weight]) => ({ ticker, weight: weight * 100 }))
+                                .sort((a, b) => b.weight - a.weight);
+                            
+                            const top10 = weightsArray.slice(0, 10);
+                            const totalWeight = weightsArray.reduce((sum, w) => sum + w.weight, 0);
+                            
+                            let weightsHtml = '<td colspan="11" class="weights-container">';
+                            weightsHtml += `<div class="weights-summary">
+                                <h4>📊 Portföy Ağırlıkları (${detail.date})</h4>
+                                <p style="margin: 5px 0; color: #666; font-size: 0.9em;">Toplam: ${totalWeight.toFixed(2)}% | En Yüksek 10 Hisse</p>
+                            </div>`;
+                            weightsHtml += '<div class="weights-grid">';
+                            
+                            top10.forEach(item => {
+                                const isHigh = item.weight >= 5.0;
+                                weightsHtml += `<div class="weight-card ${isHigh ? 'high' : ''}">
+                                    <div class="weight-ticker">${item.ticker}</div>
+                                    <div class="weight-value">${item.weight.toFixed(2)}%</div>
+                                </div>`;
+                            });
+                            
+                            weightsHtml += '</div></td>';
+                            tableHtml += `<tr class="weights-detail-row" id="weights-${idx}">${weightsHtml}</tr>`;
+                        }
+                    }
+                    
+                    tableHtml += '</tbody></table>';
+                    document.getElementById('detailsTable').innerHTML = tableHtml;
+                } else {
+                    document.getElementById('detailsTable').innerHTML = '<p>Henüz detaylı veri yok.</p>';
+                }
+                
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'Hata: ' + error.message;
+            }
+        }
+        
+        // Sayfa yüklendiğinde verileri çek
+        loadPortfolioPerformance();
+        
+        // Ağırlıkları göster/gizle fonksiyonu
+        function toggleWeights(idx) {
+            const row = document.getElementById(`weights-${idx}`);
+            const btn = document.getElementById(`btn-${idx}`);
+            
+            if (row.classList.contains('show')) {
+                row.classList.remove('show');
+                btn.textContent = 'Göster';
+            } else {
+                row.classList.add('show');
+                btn.textContent = 'Gizle';
+            }
+        }
+    </script>
+</body>
+</html>
+

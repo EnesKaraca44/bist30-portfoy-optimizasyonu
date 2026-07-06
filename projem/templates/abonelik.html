@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Abonelik - PortföyOptim</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --teal: #0d9488;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 48px 24px;
+        }
+        .container { max-width: 960px; margin: 0 auto; }
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .header h1 { font-size: 2em; font-weight: 800; margin-bottom: 12px; }
+        .header p { color: var(--text-muted); font-size: 1.05em; }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: var(--primary); text-decoration: none; font-weight: 600; margin-bottom: 32px;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+        .pricing-card {
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            transition: all 0.25s ease;
+        }
+        .pricing-card:hover { border-color: var(--primary); box-shadow: 0 20px 40px -15px rgba(14,165,233,0.2); }
+        .pricing-card.featured {
+            border-color: var(--primary);
+            background: linear-gradient(180deg, #fff 0%, #f0f9ff 100%);
+            transform: scale(1.02);
+        }
+        .pricing-card.featured .badge {
+            background: linear-gradient(135deg, var(--primary), var(--teal));
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+        .pricing-card h3 { font-size: 1.3em; margin-bottom: 8px; }
+        .pricing-card .price {
+            font-size: 2.2em;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+        .pricing-card .price span { font-size: 0.5em; font-weight: 500; color: var(--text-muted); }
+        .pricing-card ul {
+            list-style: none;
+            margin: 24px 0;
+        }
+        .pricing-card li {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95em;
+        }
+        .pricing-card li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 700;
+        }
+        .pricing-card .btn {
+            display: block;
+            width: 100%;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .pricing-card .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--teal));
+            color: white;
+        }
+        .pricing-card .btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+        .pricing-card .btn-secondary {
+            background: var(--card);
+            color: var(--text-main);
+            border: 2px solid var(--border);
+        }
+        .pricing-card .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+        .footer-note {
+            text-align: center;
+            padding: 24px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            font-size: 0.9em;
+            color: var(--text-muted);
+        }
+        .footer-note a { color: var(--primary); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← Ana Sayfaya Dön</a>
+
+        <div class="header">
+            <h1>✨ Premium Abonelik</h1>
+            <p>Haftalık tahmin arşivine ve tüm özelliklere erişim</p>
+        </div>
+
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h3>Ücretsiz</h3>
+                <div class="price">0 ₺<span>/süresiz</span></div>
+                <ul>
+                    <li>En güncel 1 haftalık portföy tahmini</li>
+                    <li>Portföy Robotu (sınırlı)</li>
+                    <li>AI Tahminleri (demo)</li>
+                </ul>
+                <a href="/register" class="btn btn-secondary">Başla</a>
+            </div>
+
+            <div class="pricing-card featured">
+                <span class="badge">ÖNERİLEN</span>
+                <h3>Premium Aylık</h3>
+                <div class="price">99 ₺<span>/ay</span></div>
+                <ul>
+                    <li>Tüm haftalık tahmin arşivi</li>
+                    <li>Full AI & ML optimizasyonları</li>
+                    <li>3, 6, 12 aylık vadeler</li>
+                    <li>Kaydedilen portföyler (sınırsız)</li>
+                </ul>
+                <a href="/odeme?plan=monthly" class="btn btn-primary">Premium'a Geç</a>
+            </div>
+
+            <div class="pricing-card">
+                <h3>Premium Yıllık</h3>
+                <div class="price">899 ₺<span>/yıl</span></div>
+                <p style="font-size: 0.85em; color: var(--success); margin-top: -8px;">2 ay ücretsiz</p>
+                <ul>
+                    <li>Premium Aylık tüm özellikleri</li>
+                    <li>%25 indirim</li>
+                    <li>Öncelikli destek</li>
+                </ul>
+                <a href="/odeme?plan=yearly" class="btn btn-primary">Premium'a Geç</a>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            Ödeme işlemleri için Stripe veya iyzico entegrasyonu yapılandırılacaktır.
+            <br>Şu an için Premium aktifleştirme: <a href="mailto:destek@portfoyoptim.com">destek@portfoyoptim.com</a> üzerinden iletişime geçin.
+        </div>
+    </div>
+</body>
+</html>

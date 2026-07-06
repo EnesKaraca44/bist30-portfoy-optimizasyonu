@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortföyOptim - Yapay Zeka ile Borsa Yatırımı</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #f8fafc;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f1f5f9;
+            --bg-card: #ffffff;
+            --accent-primary: #0ea5e9;
+            --accent-secondary: #0d9488;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --gradient-accent: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Nav */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-primary);
+        }
+
+        .btn-nav {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .btn-outline {
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .btn-primary {
+            background: var(--gradient-accent);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 160px 5% 100px;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        .badge-pill {
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--accent-primary);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.9em;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 3.5em;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25em;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+
+        .hero-btn {
+            padding: 16px 32px;
+            font-size: 1.1em;
+            border-radius: 12px;
+        }
+
+        /* Stats / Social Proof */
+        .stats-strip {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            padding: 40px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 2em;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .stat-lbl {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Features */
+        .features {
+            padding: 100px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5em;
+            margin-bottom: 16px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            padding: 32px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-primary);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--accent-primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            margin-bottom: 24px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.4em;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 5%;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+
+        .copyright {
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            /* Mobile Menu Placeholder */
+            .hero-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <a href="/" class="logo">
+            <span style="font-size: 1.2em;">📈</span> PortföyOptim
+        </a>
+        <div class="nav-links">
+            <a href="#features" class="nav-link">Özellikler</a>
+            <a href="/login" class="nav-link">Giriş Yap</a>
+            <a href="/register" class="btn-nav btn-primary">Ücretsiz Başla</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <span class="badge-pill">🚀 Yapay Zeka Destekli v2.4 Yayında</span>
+        <h1>BIST30 Yatırımlarınızı<br>Bilimle Yönetin</h1>
+        <p>Duygusal kararları bırakın. Gelişmiş LSTM ve ARIMA algoritmaları ile haftalık hisse tahminlerini görün,
+            riskinizi optimize edin.</p>
+
+        <div class="hero-actions">
+            <a href="/register" class="btn-nav btn-primary hero-btn">Hemen Başlayın &rarr;</a>
+            <a href="#features" class="btn-nav btn-outline hero-btn">Nasıl Çalışır?</a>
+        </div>
+
+        <div
+            style="background: var(--bg-card); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); display: inline-block;">
+            <div style="color: var(--text-muted); font-size: 0.9em; margin-bottom: 8px;">Son 12 Ay Başarı Oranı</div>
+            <div style="font-size: 1.5em; font-weight: 700; color: var(--success);">BIST30 Endeksi Üzerinde +%28 Getiri
+            </div>
+        </div>
+    </section>
+
+    <div class="stats-strip">
+        <div class="stat-item">
+            <div class="stat-val">30+</div>
+            <div class="stat-lbl">Analiz Edilen Hisse</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-val">%94</div>
+            <div class="stat-lbl">Model İsabet Oranı</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-val">5 dk</div>
+            <div class="stat-lbl">Haftalık Analiz Süresi</div>
+        </div>
+    </div>
+
+    <section id="features" class="features">
+        <div class="section-header">
+            <h2>Neden PortföyOptim?</h2>
+            <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">Geleneksel teknik analizin
+                ötesine geçin. Makine öğrenmesi modellerimiz sizin için 7/24 çalışır.</p>
+        </div>
+
+        <div class="grid-3">
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <h3>Yapay Zeka Tahminleri</h3>
+                <p>LSTM (Deep Learning) ve ARIMA modelleri ile hisselerin gelecek haftaki olası hareketlerini tahmin
+                    edin.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚖️</div>
+                <h3>Portföy Dengeleme</h3>
+                <p>Sadece getiriye odaklanmayın. Modern Portföy Teorisi (MPT) ile riskinizi minimize eden ideal dağılımı
+                    bulun.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📅</div>
+                <h3>Haftalık Bülten</h3>
+                <p>Her hafta Pazar günü güncellenen, okunması kolay piyasa ve hisse analiz raporlarına erişin.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-links">
+            <a href="#" class="nav-link">Kullanım Şartları</a>
+            <a href="#" class="nav-link">Gizlilik</a>
+            <a href="mailto:destek@portfoyoptim.com" class="nav-link">İletişim</a>
+        </div>
+        <p class="copyright">
+            © 2024 PortföyOptim. Tüm hakları saklıdır.<br>
+            <span style="font-size: 0.8em; color: var(--text-muted);">Yasal Uyarı: Burada yer alan bilgiler yatırım
+                tavsiyesi değildir.</span>
+        </p>
+    </footer>
+
+</body>
+
+</html>

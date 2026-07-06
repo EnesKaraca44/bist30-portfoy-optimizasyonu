@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Tahmin Performans Özeti</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+            padding: 40px 20px; 
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(20px); 
+            padding: 40px; 
+            border-radius: 24px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+        }
+        h1 { 
+            color: #1a1a2e; 
+            font-size: 2.5em; 
+            font-weight: 700; 
+            margin-bottom: 10px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+        .subtitle { color: #666; font-size: 1.1em; margin-bottom: 40px; }
+        .nav { margin-bottom: 30px; }
+        .nav a { 
+            display: inline-block; 
+            padding: 10px 20px; 
+            background: #667eea; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            margin-right: 10px; 
+        }
+        .nav a:hover { background: #5568d3; }
+        .general-stats { 
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); 
+            padding: 30px; 
+            border-radius: 16px; 
+            margin-bottom: 30px; 
+            color: white; 
+        }
+        .general-stats h2 { margin-bottom: 20px; }
+        .stat-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 20px; 
+        }
+        .stat-card { 
+            background: rgba(255,255,255,0.2); 
+            padding: 20px; 
+            border-radius: 12px; 
+        }
+        .stat-value { font-size: 2em; font-weight: bold; }
+        .stat-label { font-size: 0.9em; opacity: 0.9; }
+        .stat-value.positive { color: #4caf50; }
+        .stat-value.negative { color: #ff5252; }
+        .ticker-section { 
+            margin-bottom: 40px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 12px; 
+            padding: 20px; 
+            background: #f9f9f9; 
+        }
+        .ticker-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            padding-bottom: 15px; 
+            border-bottom: 2px solid #667eea; 
+        }
+        .ticker-name { font-size: 1.5em; font-weight: bold; color: #1a1a2e; }
+        .ticker-stats { display: flex; gap: 30px; }
+        .ticker-stat { text-align: center; }
+        .ticker-stat-value { font-size: 1.5em; font-weight: bold; color: #667eea; }
+        .ticker-stat-label { font-size: 0.9em; color: #666; }
+        .success-badge { 
+            display: inline-block; 
+            padding: 5px 15px; 
+            border-radius: 20px; 
+            font-weight: bold; 
+            font-size: 0.9em; 
+        }
+        .success-high { background: #4caf50; color: white; }
+        .success-medium { background: #ff9800; color: white; }
+        .success-low { background: #f44336; color: white; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+        }
+        th { 
+            background: #667eea; 
+            color: white; 
+            padding: 12px; 
+            text-align: left; 
+        }
+        td { 
+            padding: 12px; 
+            border-bottom: 1px solid #e0e0e0; 
+        }
+        tr:hover { background: #f5f5f5; }
+        .correct { color: #4caf50; font-weight: bold; }
+        .incorrect { color: #f44336; font-weight: bold; }
+        .loading { text-align: center; padding: 40px; font-size: 1.2em; color: #666; }
+        .error { 
+            background: #ffebee; 
+            color: #c62828; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin: 20px 0; 
+        }
+        .toggle-details { 
+            background: #667eea; 
+            color: white; 
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin-top: 10px; 
+        }
+        .toggle-details:hover { background: #5568d3; }
+        .details-table { display: none; margin-top: 15px; }
+        .details-table.show { display: block; }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #c7254e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="/">Ana Sayfa</a>
+            <a href="/compare">MPT vs AI/ML</a>
+        </div>
+        
+        <h1>📊 Model Tahmin Performans Özeti</h1>
+        <p class="subtitle">Modelinizin tahminlerinin gerçekleşen değerlerle karşılaştırması</p>
+        
+        <div class="info-box">
+            <strong>ℹ️ Otomatik Güncelleme:</strong><br>
+            Bu sayfa her açıldığında, horizon dolmuş tahminler için otomatik olarak gerçekleşen değerler hesaplanır ve güncellenir.
+            Yeni tahmin yapmak için: <code>python weekly_forecast.py</code>
+        </div>
+        
+        <div id="loading" class="loading">⏳ Yükleniyor ve gerçekleşen değerler hesaplanıyor...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <div id="generalStats" style="display: none;"></div>
+        <div id="tickerDetails"></div>
+    </div>
+
+    <script>
+        async function loadForecastSummary() {
+            try {
+                const response = await fetch('/api/forecast_summary');
+                const data = await response.json();
+                
+                document.getElementById('loading').style.display = 'none';
+                
+                if (!data.success) {
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error').textContent = data.message || 'Veri yüklenemedi.';
+                    return;
+                }
+                
+                // Otomatik backfill bilgisi
+                if (data.updated && data.updated > 0) {
+                    const infoBox = document.createElement('div');
+                    infoBox.className = 'info-box';
+                    infoBox.innerHTML = `<strong>✓ Otomatik Güncelleme:</strong> ${data.updated} bireysel hisse tahmini gerçekleşen değerlerle güncellendi.`;
+                    infoBox.style.background = '#d4edda';
+                    infoBox.style.borderLeft = '4px solid #28a745';
+                    infoBox.style.color = '#155724';
+                    document.querySelector('.container').insertBefore(infoBox, document.getElementById('loading'));
+                }
+                
+                // Genel istatistikler
+                const general = data.general;
+                // Geçen hafta metrikleri
+                let lastWeekHtml = '';
+                if (general.last_week_total && general.last_week_total > 0) {
+                    const lastWeekRateClass = general.last_week_success_rate >= 50 ? 'positive' : 'negative';
+                    lastWeekHtml = `
+                        <div style="margin-top: 30px; padding-top: 30px; border-top: 2px solid rgba(255,255,255,0.3);">
+                            <h3 style="margin-bottom: 15px; font-size: 1.3em;">📅 Geçen Hafta Performansı (En Son Tahmin)</h3>
+                            <div class="stat-grid">
+                                <div class="stat-card">
+                                    <div class="stat-value">${general.last_week_total}</div>
+                                    <div class="stat-label">Geçen Hafta Tahmin</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value ${lastWeekRateClass}">${general.last_week_success_rate}%</div>
+                                    <div class="stat-label">Geçen Hafta Başarı</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">${general.last_week_correct}</div>
+                                    <div class="stat-label">Doğru Tahmin</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">%${general.last_week_avg_error}</div>
+                                    <div class="stat-label">Ortalama Hata</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('generalStats').innerHTML = `
+                    <div class="general-stats">
+                        <h2>📈 Genel Performans (Her Hisse İçin Son 3 Tahmin)</h2>
+                        <div class="stat-grid">
+                            <div class="stat-card">
+                                <div class="stat-value">${general.total_forecasts}</div>
+                                <div class="stat-label">Toplam Tahmin</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">${general.overall_success_rate}%</div>
+                                <div class="stat-label">Genel Başarı Oranı</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">${general.correct_predictions}</div>
+                                <div class="stat-label">Doğru Tahmin</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">%${general.avg_error}</div>
+                                <div class="stat-label">Ortalama Hata</div>
+                            </div>
+                        </div>
+                        ${lastWeekHtml}
+                    </div>
+                `;
+                document.getElementById('generalStats').style.display = 'block';
+                
+                // Her hisse için detaylar
+                let tickerHtml = '';
+                for (const [ticker, summary] of Object.entries(data.summary)) {
+                    const successClass = summary.success_rate >= 60 ? 'success-high' : 
+                                       summary.success_rate >= 40 ? 'success-medium' : 'success-low';
+                    
+                    let detailsHtml = '';
+                    if (data.details[ticker]) {
+                        detailsHtml = '<table class="details-table" id="details-' + ticker + '">';
+                        detailsHtml += '<thead><tr><th>Tarih</th><th>Model Tahmini</th><th>Gerçekleşen</th><th>Fark</th><th>Yön</th></tr></thead><tbody>';
+                        for (const detail of data.details[ticker]) {
+                            if (detail.status === 'pending') {
+                                detailsHtml += `<tr>
+                                    <td>${detail.date}</td>
+                                    <td>${detail.predicted > 0 ? '+' : ''}${detail.predicted}%</td>
+                                    <td style="color: #ff9800; font-weight: bold;">⏳ Bekleniyor</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>`;
+                            } else {
+                                const directionClass = detail.direction_correct ? 'correct' : 'incorrect';
+                                const directionText = detail.direction_correct ? '✓ DOĞRU' : '✗ YANLIŞ';
+                                detailsHtml += `<tr>
+                                    <td>${detail.date}</td>
+                                    <td>${detail.predicted > 0 ? '+' : ''}${detail.predicted}%</td>
+                                    <td>${detail.actual > 0 ? '+' : ''}${detail.actual}%</td>
+                                    <td>${detail.error}%</td>
+                                    <td class="${directionClass}">${directionText}</td>
+                                </tr>`;
+                            }
+                        }
+                        detailsHtml += '</tbody></table>';
+                    }
+                    
+                    tickerHtml += `
+                        <div class="ticker-section">
+                            <div class="ticker-header">
+                                <div class="ticker-name">${ticker}</div>
+                                <div>
+                                    <span class="success-badge ${successClass}">${summary.success_rate}% Başarı</span>
+                                </div>
+                            </div>
+                            <div class="ticker-stats">
+                                <div class="ticker-stat">
+                                    <div class="ticker-stat-value">${summary.total_forecasts}</div>
+                                    <div class="ticker-stat-label">Toplam Tahmin</div>
+                                </div>
+                                <div class="ticker-stat">
+                                    <div class="ticker-stat-value">${summary.correct_predictions}/${summary.total_forecasts}</div>
+                                    <div class="ticker-stat-label">Doğru Tahmin</div>
+                                </div>
+                                <div class="ticker-stat">
+                                    <div class="ticker-stat-value">%${summary.avg_error}</div>
+                                    <div class="ticker-stat-label">Ortalama Hata</div>
+                                </div>
+                            </div>
+                            <button class="toggle-details" onclick="toggleDetails('${ticker}')">Detayları Göster/Gizle</button>
+                            ${detailsHtml}
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('tickerDetails').innerHTML = tickerHtml;
+                
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'Hata: ' + error.message;
+            }
+        }
+        
+        function toggleDetails(ticker) {
+            const detailsTable = document.getElementById('details-' + ticker);
+            if (detailsTable) {
+                detailsTable.classList.toggle('show');
+            }
+        }
+        
+        // Sayfa yüklendiğinde verileri çek
+        loadForecastSummary();
+    </script>
+</body>
+</html>
+

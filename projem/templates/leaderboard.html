@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liderlik Tablosu - Portföy Robotu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            /* Dark Navy for background */
+            color: #f8fafc;
+        }
+
+        .transform-hover {
+            transition: transform 0.3s ease;
+        }
+
+        .transform-hover:hover {
+            transform: translateY(-5px);
+        }
+
+        .slide-up-animation {
+            animation: slideUp 1s ease-out;
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes slideUp {
+            0% {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        }
+
+        .bg-gradient-dark {
+            background: linear-gradient(to right, #1e293b, #0f172a);
+        }
+
+        .custom-card {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #334155;
+            background-color: #1e293b;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="/" class="btn-back"><i class="fas fa-arrow-left mr-2"></i> Ana Ekrana Dön</a>
+    <div class="container mt-5 pt-4">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h1 class="display-4 font-weight-bold text-white mb-3">
+                    <i class="fas fa-trophy text-warning mr-2"></i> Liderlik Tablosu
+                </h1>
+                <p class="lead text-light">Kullanıcı Portföyleri vs. BIST30 Yapay Zeka Botu</p>
+                <div class="mt-4 mb-4">
+                    <a href="/create_portfolio" class="btn btn-warning btn-lg font-weight-bold shadow transform-hover">
+                        <i class="fas fa-plus-circle mr-2"></i> Kendi Portföyünü Oluştur & Yarışmaya Katıl
+                    </a>
+                </div>
+                {% if week_end_date %}
+                <span class="badge badge-primary py-2 px-3"><i class="far fa-calendar-alt mr-1"></i> Hafta Kapanışı: {{
+                    week_end_date }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <!-- YAPAY ZEKA SKOR KARTI -->
+            <div class="col-md-10 mb-5">
+                <div class="card bg-dark border-info shadow-lg transform-hover">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-robot fa-3x text-info mb-3 slide-up-animation"></i>
+                        <h3 class="text-white font-weight-bold">Yapay Zeka (Max Sharpe)</h3>
+                        <h2
+                            class="{% if ai_return > 0 %}text-success{% elif ai_return < 0 %}text-danger{% else %}text-warning{% endif %} font-weight-bold display-4 my-2 pulse-animation">
+                            %{{ "%.2f"|format(ai_return|default(0)) }}
+                        </h2>
+                        <p class="text-muted mb-0">AI'ın bu haftaki portföy getirisi</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KULLANICI SIRALAMASI -->
+            <div class="col-md-10 mb-5">
+                <div class="card custom-card">
+                    <div class="card-header bg-gradient-primary text-white text-center py-3">
+                        <h4 class="mb-0"><i class="fas fa-users mr-2"></i> En İyi Yatırımcılar</h4>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if leaderboard %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-dark mb-0 text-center">
+                                <thead>
+                                    <tr class="text-muted">
+                                        <th class="border-top-0 py-3" style="width: 15%">Sıra</th>
+                                        <th class="border-top-0 py-3 text-left">Kullanıcı</th>
+                                        <th class="border-top-0 py-3">Getiri</th>
+                                        <th class="border-top-0 py-3">Durum</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for record in leaderboard %}
+                                    <tr class="{% if loop.index <= 3 %}bg-gradient-dark{% endif %}">
+                                        <td class="align-middle">
+                                            {% if loop.index == 1 %}
+                                            <i class="fas fa-medal text-warning fa-2x"></i>
+                                            {% elif loop.index == 2 %}
+                                            <i class="fas fa-medal text-light fa-2x"></i>
+                                            {% elif loop.index == 3 %}
+                                            <i class="fas fa-medal text-orange fa-2x" style="color: #cd7f32;"></i>
+                                            {% else %}
+                                            <span class="text-muted font-weight-bold" style="font-size: 1.2rem;">#{{
+                                                loop.index }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="align-middle text-left">
+                                            <span class="font-weight-bold text-white" style="font-size: 1.1rem;">{{
+                                                record.username }}</span>
+                                        </td>
+                                        <td class="align-middle">
+                                            <span
+                                                class="badge {% if record.return > 0 %}badge-success{% elif record.return < 0 %}badge-danger{% else %}badge-warning{% endif %} py-2 px-3"
+                                                style="font-size: 1rem;">
+                                                %{{ "%.2f"|format(record.return) }}
+                                            </span>
+                                        </td>
+                                        <td class="align-middle">
+                                            {% if record.is_winner %}
+                                            <span class="text-success font-weight-bold"><i
+                                                    class="fas fa-check-circle mr-1"></i> AI'ı Yendi</span>
+                                            {% else %}
+                                            <span class="text-danger"><i class="fas fa-times-circle mr-1"></i> AI
+                                                Kazandı</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center p-5">
+                            <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                            <h5 class="text-white">Henüz haftalık veri yok.</h5>
+                            <p class="text-muted">İlk yarışma sonuçları Cuma günü kapanışından sonra burada
+                                listelenecek.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

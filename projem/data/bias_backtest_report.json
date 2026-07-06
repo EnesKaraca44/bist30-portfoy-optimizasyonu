@@ -1,0 +1,8 @@
+{
+  "success": true,
+  "samples": 434,
+  "raw_mae": 6.13,
+  "corrected_mae": 5.933,
+  "improvement_pct": 3.23,
+  "mae_improved": true
+}

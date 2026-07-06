@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portföy Oluştur - Liderlik Yarışması</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-card: #111827;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent-primary: #0ea5e9;
+            --accent-hover: #0284c7;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            font-family: 'Sora', sans-serif;
+            margin-top: 0;
+            color: var(--accent-primary);
+            text-align: center;
+        }
+
+        p {
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        select {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        select:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+
+        select option {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: white;
+        }
+
+        .stock-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .stock-row .select-container {
+            flex: 2;
+            position: relative;
+        }
+
+        .stock-row .weight-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .weight-container input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .weight-container input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+
+        .weight-badge {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        .total-weight-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .total-weight-box span.valid {
+            color: #10b981;
+        }
+
+        .total-weight-box span.invalid {
+            color: var(--danger);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>🎯 Portföy Oluştur</h1>
+        <p>Haftalık liderlik tablosu yarışması için BIST30 endeksinden güvendiğiniz <strong>5 farklı hisseyi</strong>
+            seçin ve ağırlıklarını belirleyin (Toplam %100 olmalıdır).</p>
+
+        {% if error %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-circle"></i> {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/create_portfolio" id="portfolioForm">
+            <div class="total-weight-box">
+                <span>Toplam Ağırlık:</span>
+                <span id="totalWeight" class="valid">%100.0</span>
+            </div>
+
+            {% for i in range(1, 6) %}
+            <div class="form-group">
+                <label for="stock{{ i }}">{{ i }}. Hisse Senedi & Ağırlık</label>
+                <div class="stock-row">
+                    <div class="select-container">
+                        <select name="stock{{ i }}" id="stock{{ i }}" required>
+                            <option value="" disabled selected>Hisse seçin...</option>
+                            {% for ticker in bist30 %}
+                            <option value="{{ ticker }}">{{ ticker }}</option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-chevron-down"
+                            style="position: absolute; right: 15px; top: 18px; color: var(--text-secondary); pointer-events: none;"></i>
+                    </div>
+                    <div class="weight-container">
+                        <input type="number" name="weight{{ i }}" class="weight-input" min="1" max="96" step="0.1"
+                            value="20" required>
+                        <span class="weight-badge">%</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="submit-btn" id="submitBtn"><i class="fas fa-save"></i> Portföyü Kaydet &
+                Yarışmaya Katıl</button>
+        </form>
+
+        <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Ana Sayfaya Dön</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const weightInputs = document.querySelectorAll('.weight-input');
+            const totalWeightSpan = document.getElementById('totalWeight');
+            const submitBtn = document.getElementById('submitBtn');
+
+            function updateTotal() {
+                let total = 0;
+                weightInputs.forEach(input => {
+                    total += parseFloat(input.value) || 0;
+                });
+
+                totalWeightSpan.innerText = '%' + total.toFixed(1);
+
+                // Allow small floating point precision errors
+                if (Math.abs(total - 100) > 0.1) {
+                    totalWeightSpan.className = 'invalid';
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = '0.5';
+                    submitBtn.style.cursor = 'not-allowed';
+                } else {
+                    totalWeightSpan.className = 'valid';
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+                }
+            }
+
+            weightInputs.forEach(input => {
+                input.addEventListener('input', updateTotal);
+            });
+
+            // Form submission validation
+            document.getElementById('portfolioForm').addEventListener('submit', function (e) {
+                let total = 0;
+                weightInputs.forEach(input => {
+                    total += parseFloat(input.value) || 0;
+                });
+
+                if (Math.abs(total - 100) > 0.1) {
+                    e.preventDefault();
+                    alert('Toplam ağırlık %100 olmalıdır. Lütfen kontrol edin.');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

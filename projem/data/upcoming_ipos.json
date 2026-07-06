@@ -1,0 +1,146 @@
+{
+  "surum": 1,
+  "son_guncelleme": "2026-07-04",
+  "alan_rehberi": {
+    "borsa_kodu": "BIST kodu",
+    "sirket_adi": "Şirket unvanı",
+    "durum": "planlanan | onaylandi | talep_topluyor | islem_bekliyor",
+    "borsada_islem_tarihi": "Borsada ilk işlem günü (YYYY-MM-DD) — KAP duyurusu",
+    "talep_toplama_baslangic": "Talep ilk gün",
+    "talep_toplama_bitis": "Talep son gün",
+    "buyukluk_milyon_tl": "Halka arz büyüklüğü (milyon TL)",
+    "kurumsal_oran_yuzde": "Kurumsal tahsis (%) — resimdeki Tahsisat tablosu",
+    "iskonto_yuzde": "Tahmin modeli için — izahnameden (sabit fiyatta aşağıdaki rehbere bak)",
+    "sektor": "Perakende, Enerji, ...",
+    "veri_durumu": "tam | kismi",
+    "kap_linki": "KAP veya şirket izahname sayfası"
+  },
+  "halka_arzlar": [
+    {
+      "borsa_kodu": "SSAAT",
+      "sirket_adi": "Saat ve Saat Sanayi ve Tic. A.Ş.",
+      "durum": "talep_topluyor",
+
+      "borsada_islem_tarihi": "2026-07-15",
+      "tahmini_islem_tarihi_bitis": "2026-07-16",
+      "islem_tarihi_tahmini": true,
+
+      "talep_toplama_baslangic": "2026-07-06",
+      "talep_toplama_bitis": "2026-07-08",
+
+      "buyukluk_milyon_tl": 3749,
+      "buyukluk_ek_satış_dahil_milyon_tl": 4499,
+      "kurumsal_oran_yuzde": 40,
+      "bireysel_oran_yuzde": 60,
+      "iskonto_yuzde": 37.01,
+      "iskonto_kaynak": "Fiyat tespit raporu — gerçek değerden %37,01 iskontolu 56 TL",
+
+      "sektor": "Perakende",
+      "halka_arz_fiyati_tl": 56,
+      "halka_aciklik_orani_yuzde": 10.14,
+      "halka_aciklik_ek_satış_dahil_yuzde": 12.16,
+      "fiyat_istikrari_gun": 30,
+      "pazar": "Yıldız Pazar",
+      "dağıtım_yontemi": "Eşit dağıtım",
+      "katilim_endeksi": true,
+
+      "kap_linki": "https://saatvesaat.com/yatirimci-iliskileri/halka-arz-bilgileri-ve-raporlar/izahname-ve-ekleri",
+
+      "veri_durumu": "tam",
+      "son_guncelleme": "2026-07-04",
+
+      "eksik_alanlar": [],
+      "notlar": "İskonto %37,01 ve tahmini işlem 15-16 Temmuz 2026 eklendi. Kesin işlem tarihi KAP duyurusu ile güncellenir."
+    },
+    {
+      "borsa_kodu": "GOLDA",
+      "sirket_adi": "Golda Gıda Sanayi ve Ticaret A.Ş.",
+      "durum": "islem_bekliyor",
+
+      "borsada_islem_tarihi": null,
+      "talep_toplama_baslangic": "2026-07-01",
+      "talep_toplama_bitis": "2026-07-02",
+
+      "buyukluk_milyon_tl": 805,
+      "buyukluk_ek_satış_dahil_milyon_tl": null,
+      "kurumsal_oran_yuzde": 0,
+      "bireysel_oran_yuzde": 100,
+      "iskonto_yuzde": 30.70,
+      "iskonto_kaynak": "Net iskonto oranı %30,70",
+      "tahsisat_gruplari": "Yok — kurumsal tahsis %0",
+
+      "sektor": "Gıda",
+      "halka_arz_fiyati_tl": 9.2,
+      "halka_aciklik_orani_yuzde": 35,
+      "halka_aciklik_ek_satış_dahil_yuzde": null,
+      "fiyat_istikrari_gun": 30,
+      "pazar": "Ana Pazar",
+      "dağıtım_yontemi": "Sabit fiyat — tahsisat grubu yok",
+      "katilim_endeksi": true,
+      "sermaye_artirimi_tl": 50000000,
+      "ortak_satisi_tl": 37499998,
+      "toplam_lot": 87499998,
+
+      "kap_linki": "https://www.kap.org.tr",
+
+      "veri_durumu": "kismi",
+      "son_guncelleme": "2026-07-04",
+
+      "resimden_alinanlar": [
+        "talep 1-2 Temmuz 2026",
+        "fiyat 9,20 TL",
+        "büyüklük ~805 milyon TL",
+        "halka açıklık %35",
+        "Ana Pazar",
+        "fiyat istikrarı 30 gün",
+        "katılım endeksine uygun"
+      ],
+
+      "eksik_alanlar": [
+        "borsada_islem_tarihi"
+      ],
+
+      "notlar": "İskonto %30,70 ve kurumsal %0 eklendi. Sadece borsada işlem tarihi KAP duyurusunu bekliyor."
+    },
+    {
+      "borsa_kodu": "SARAE",
+      "sirket_adi": "Şa-Ra Enerji İnşaat Tic. ve San. A.Ş.",
+      "durum": "talep_topluyor",
+
+      "borsada_islem_tarihi": null,
+      "talep_toplama_baslangic": "2026-07-08",
+      "talep_toplama_bitis": "2026-07-10",
+      "talep_toplama_saati": "09:00-17:00",
+
+      "buyukluk_milyon_tl": 6200,
+      "kurumsal_oran_yuzde": 50,
+      "bireysel_oran_yuzde": 50,
+      "iskonto_yuzde": 20,
+      "iskonto_kaynak": "Fiyat tespit raporu — halka arz iskontosu %20",
+
+      "sektor": "Enerji",
+      "halka_arz_fiyati_tl": 70,
+      "halka_aciklik_orani_yuzde": 20.02,
+      "fiyat_istikrari_gun": 0,
+      "fiyat_istikrari_not": "Planlanmamaktadır",
+      "pazar": "Yıldız Pazar",
+      "dağıtım_yontemi": "Eşit dağıtım",
+      "toplam_lot": 89000000,
+      "sermaye_artirimi_lot": 44500000,
+      "ortak_satisi_lot": 44500000,
+      "araci_kurum": "Tera Yatırım Menkul Değerler A.Ş.",
+      "satmama_taahhudu_yil": 1,
+
+      "kap_linki": "https://www.kap.org.tr",
+
+      "veri_durumu": "kismi",
+      "son_guncelleme": "2026-07-04",
+
+      "eksik_alanlar": [
+        "borsada_islem_tarihi"
+      ],
+
+      "notlar": "Kurumsal %50 / bireysel %50. Sadece borsada işlem tarihi KAP duyurusunu bekliyor."
+    }
+  ]
+}

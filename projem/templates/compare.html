@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPT vs AI/ML Karşılaştırması - BIST 30</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .controls label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #333;
+        }
+        
+        .controls select {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            font-size: 1em;
+            margin-right: 20px;
+        }
+        
+        .btn {
+            padding: 12px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+        
+        .results {
+            display: none;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .method-card {
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .method-card.mpt {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .method-card.aiml {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .method-card h2 {
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+        
+        .method-card .description {
+            margin-bottom: 20px;
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+        
+        .metric {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        
+        .weights {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .weight-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .improvement-section {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .improvement-section h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .improvement-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .improvement-card {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .improvement-card .label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        
+        .improvement-card .value {
+            color: white;
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        .improvement-card .value.positive {
+            color: #00ff88;
+        }
+        
+        .improvement-card .value.negative {
+            color: #ff4444;
+        }
+        
+        .error {
+            background: #ff4444;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-grid,
+            .improvement-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 MPT vs AI/ML Karşılaştırması</h1>
+        <p class="subtitle">Klasik Modern Portföy Teorisi ile Gelişmiş AI/ML Sistemini Karşılaştırın</p>
+        
+        <div class="controls">
+            <label for="months">Tahmin Ufku:</label>
+            <select id="months">
+                <option value="1">1 Ay</option>
+                <option value="3">3 Ay</option>
+                <option value="6">6 Ay</option>
+                <option value="12" selected>12 Ay (Yıllık)</option>
+            </select>
+            <button class="btn" onclick="compareMethod()">🚀 Karşılaştırmayı Başlat</button>
+        </div>
+        
+        <div id="loading">
+            ⏳ Sistemler hesaplanıyor, lütfen bekleyin...<br>
+            <small>(Bu işlem 10-15 saniye sürebilir)</small>
+        </div>
+        
+        <div id="error" class="error"></div>
+        
+        <div id="results" class="results">
+            <div class="comparison-grid">
+                <!-- MPT Card -->
+                <div class="method-card mpt">
+                    <h2>📊 Klasik MPT</h2>
+                    <p class="description" id="mpt-description"></p>
+                    
+                    <div class="metric">
+                        <div class="metric-label">Beklenen Getiri</div>
+                        <div class="metric-value" id="mpt-return">-</div>
+                    </div>
+                    
+                    <div class="metric">
+                        <div class="metric-label">Risk (Volatilite)</div>
+                        <div class="metric-value" id="mpt-risk">-</div>
+                    </div>
+                    
+                    <div class="metric">
+                        <div class="metric-label">Sharpe Ratio</div>
+                        <div class="metric-value" id="mpt-sharpe">-</div>
+                    </div>
+                    
+                    <h3 style="margin-top: 20px; margin-bottom: 10px;">Portföy Dağılımı</h3>
+                    <div class="weights" id="mpt-weights"></div>
+                </div>
+                
+                <!-- AI/ML Card -->
+                <div class="method-card aiml">
+                    <h2>🤖 Gelişmiş AI/ML</h2>
+                    <p class="description" id="aiml-description"></p>
+                    
+                    <div class="metric">
+                        <div class="metric-label">Beklenen Getiri</div>
+                        <div class="metric-value" id="aiml-return">-</div>
+                    </div>
+                    
+                    <div class="metric">
+                        <div class="metric-label">Risk (Volatilite)</div>
+                        <div class="metric-value" id="aiml-risk">-</div>
+                    </div>
+                    
+                    <div class="metric">
+                        <div class="metric-label">Sharpe Ratio</div>
+                        <div class="metric-value" id="aiml-sharpe">-</div>
+                    </div>
+                    
+                    <h3 style="margin-top: 20px; margin-bottom: 10px;">Portföy Dağılımı</h3>
+                    <div class="weights" id="aiml-weights"></div>
+                </div>
+            </div>
+            
+            <!-- Improvement Section -->
+            <div class="improvement-section">
+                <h2>🏆 İYİLEŞTİRME METRİKLERİ</h2>
+                <div class="improvement-grid">
+                    <div class="improvement-card">
+                        <div class="label">Getiri İyileşmesi</div>
+                        <div class="value positive" id="return-improvement">-</div>
+                    </div>
+                    <div class="improvement-card">
+                        <div class="label">Risk Azalması</div>
+                        <div class="value positive" id="risk-improvement">-</div>
+                    </div>
+                    <div class="improvement-card">
+                        <div class="label">Sharpe İyileşmesi</div>
+                        <div class="value positive" id="sharpe-improvement">-</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px;">
+                    <p style="color: white; font-size: 1.1em;">
+                        <strong>Metodoloji Farkı:</strong><br>
+                        <span id="method-difference"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="/" style="color: #667eea; text-decoration: none; font-size: 1.1em;">← Ana Sayfaya Dön</a>
+        </div>
+    </div>
+    
+    <script>
+        function compareMethod() {
+            const months = document.getElementById('months').value;
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const error = document.getElementById('error');
+            const btn = document.querySelector('.btn');
+            
+            // UI güncelleme
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            error.style.display = 'none';
+            btn.disabled = true;
+            
+            // API çağrısı
+            fetch('/api/compare_methods', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ months: parseInt(months) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    showError(data.error || 'Bilinmeyen bir hata oluştu');
+                }
+            })
+            .catch(err => {
+                showError('Sunucu ile bağlantı kurulamadı: ' + err.message);
+            })
+            .finally(() => {
+                loading.style.display = 'none';
+                btn.disabled = false;
+            });
+        }
+        
+        function displayResults(data) {
+            const { mpt, aiml, comparison } = data;
+            
+            // MPT sonuçları
+            document.getElementById('mpt-description').textContent = mpt.description;
+            document.getElementById('mpt-return').textContent = (mpt.max_sharpe.return * 100).toFixed(2) + '%';
+            document.getElementById('mpt-risk').textContent = (mpt.max_sharpe.risk * 100).toFixed(2) + '%';
+            document.getElementById('mpt-sharpe').textContent = mpt.max_sharpe.sharpe.toFixed(3);
+            
+            // MPT weights
+            const mptWeightsHtml = Object.entries(mpt.max_sharpe.weights)
+                .filter(([_, weight]) => weight > 0.001)
+                .sort((a, b) => b[1] - a[1])
+                .map(([ticker, weight]) => 
+                    `<div class="weight-item"><span>${ticker}</span><span>${(weight * 100).toFixed(1)}%</span></div>`
+                ).join('');
+            document.getElementById('mpt-weights').innerHTML = mptWeightsHtml;
+            
+            // AI/ML sonuçları
+            document.getElementById('aiml-description').textContent = aiml.description;
+            document.getElementById('aiml-return').textContent = (aiml.max_sharpe.return * 100).toFixed(2) + '%';
+            document.getElementById('aiml-risk').textContent = (aiml.max_sharpe.risk * 100).toFixed(2) + '%';
+            document.getElementById('aiml-sharpe').textContent = aiml.max_sharpe.sharpe.toFixed(3);
+            
+            // AI/ML weights
+            const aimlWeightsHtml = Object.entries(aiml.max_sharpe.weights)
+                .filter(([_, weight]) => weight > 0.001)
+                .sort((a, b) => b[1] - a[1])
+                .map(([ticker, weight]) => 
+                    `<div class="weight-item"><span>${ticker}</span><span>${(weight * 100).toFixed(1)}%</span></div>`
+                ).join('');
+            document.getElementById('aiml-weights').innerHTML = aimlWeightsHtml;
+            
+            // İyileştirme metrikleri
+            document.getElementById('return-improvement').textContent = 
+                (comparison.return_improvement > 0 ? '+' : '') + comparison.return_improvement.toFixed(2) + '%';
+            document.getElementById('risk-improvement').textContent = 
+                (comparison.risk_improvement > 0 ? '+' : '') + comparison.risk_improvement.toFixed(2) + '%';
+            document.getElementById('sharpe-improvement').textContent = 
+                (comparison.sharpe_improvement > 0 ? '+' : '') + comparison.sharpe_improvement.toFixed(2) + '%';
+            
+            // Metodoloji farkı
+            document.getElementById('method-difference').innerHTML = `
+                <strong>MPT:</strong> ${comparison.mpt_method} (${comparison.mpt_features})<br>
+                <strong>AI/ML:</strong> ${comparison.aiml_method} (${comparison.aiml_features})
+            `;
+            
+            // Sonuçları göster
+            document.getElementById('results').style.display = 'block';
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = '❌ Hata: ' + message;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
