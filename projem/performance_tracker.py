@@ -169,6 +169,8 @@ def backfill_actuals_for_ticker(ticker, horizon_days=5, lookback_days=30):
         
         try:
             prices = yf.download(ticker, start=start, end=end, progress=False)['Close']
+            if isinstance(prices, pd.DataFrame):
+                prices = prices.squeeze()
             prices = prices.dropna()
             
             if len(prices) < 2:
@@ -209,13 +211,21 @@ def backfill_actuals_for_ticker(ticker, horizon_days=5, lookback_days=30):
                     
                     # Target date için fiyat bul (tam eşleşme veya sonraki en yakın)
                     end_price = None
-                    if target_ts in prices.index:
+                    if target_ts in prices.index and not pd.isna(prices.loc[target_ts]) and float(prices.loc[target_ts]) > 0:
                         end_price = float(prices.loc[target_ts])
                     else:
                         # Sonraki en yakın tarihi al
-                        future_prices = prices[prices.index >= target_ts]
-                        if len(future_prices) > 0:
+                        future_prices = prices[prices.index >= target_ts].dropna()
+                        if len(future_prices) > 0 and float(future_prices.iloc[0]) > 0:
                             end_price = float(future_prices.iloc[0])
+                        elif target_date >= today - timedelta(days=4):
+                            try:
+                                tk = yf.Ticker(ticker)
+                                fi = getattr(tk, 'fast_info', None)
+                                if fi and 'lastPrice' in fi and fi['lastPrice'] and not pd.isna(fi['lastPrice']) and float(fi['lastPrice']) > 0:
+                                    end_price = float(fi['lastPrice'])
+                            except Exception:
+                                pass
                     
                     if end_price is None or pd.isna(end_price) or end_price <= 0:
                         continue

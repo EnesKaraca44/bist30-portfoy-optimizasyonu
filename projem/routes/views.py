@@ -1314,6 +1314,9 @@ def register_routes(app):
                     **risk,
                 })
         
+            # Detayları tarihe göre (en yeni en üstte) sırala
+            details.sort(key=lambda x: x['date'], reverse=True)
+
             # Haftalık bülten için: GELECEK haftanın tahmini (pending) öncelikli
             # Pending = henüz gerçekleşmemiş = gelecek hafta tahmini; Completed = geçmiş hafta gerçekleşmiş
             pending_list = [d for d in details if d['status'] == 'pending']

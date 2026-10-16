@@ -37,12 +37,21 @@ setup_user_portfolios_table()
 setup_leaderboard_table()
 
 from performance_tracker import setup_performance_tables
-from portfolio_performance_tracker import setup_portfolio_performance_table
+from portfolio_performance_tracker import setup_portfolio_performance_table, backfill_portfolio_performance
 from db.migrate_legacy import migrate_legacy_data
+import threading
 
 setup_performance_tables()
 setup_portfolio_performance_table()
 migrate_legacy_data()
+
+def _startup_backfill():
+    try:
+        backfill_portfolio_performance(lookback_days=30)
+    except Exception as e:
+        logger.warning("Startup backfill hatasi: %s", e)
+
+threading.Thread(target=_startup_backfill, daemon=True).start()
 
 @login_manager.user_loader
 def load_user(user_id):

@@ -283,6 +283,8 @@ def calculate_portfolio_actual(forecast_date, horizon_days, weights_dict):
         if len(tickers) == 1:
             prices = prices.to_frame(name=tickers[0])
         
+        raw_prices = prices.copy()
+
         # NaN temizleme
         prices = prices.ffill().bfill()
         
@@ -310,20 +312,42 @@ def calculate_portfolio_actual(forecast_date, horizon_days, weights_dict):
         
         # Bitiş fiyatları
         target_ts = pd.Timestamp(target_date)
+        today_date = datetime.now().date()
         end_prices = {}
         for ticker in tickers:
-            if target_ts in prices.index:
-                end_prices[ticker] = float(prices.loc[target_ts, ticker])
+            val = None
+            if target_ts in raw_prices.index and not pd.isna(raw_prices.loc[target_ts, ticker]) and float(raw_prices.loc[target_ts, ticker]) > 0:
+                val = float(raw_prices.loc[target_ts, ticker])
             else:
-                future_prices = prices[prices.index >= target_ts]
-                if len(future_prices) > 0:
-                    end_prices[ticker] = float(future_prices.iloc[0][ticker])
-                    if DEBUG:
-                        print(f"[Actual] {ticker} bitiş: {future_prices.index[0]} tarihinden alındı")
-                else:
-                    if DEBUG:
-                        print(f"[Actual] HATA: {ticker} için bitiş fiyatı bulunamadı")
-                    return None
+                future_prices = raw_prices[raw_prices.index >= target_ts]
+                if len(future_prices) > 0 and ticker in future_prices:
+                    fut_valid = future_prices[ticker].dropna()
+                    if len(fut_valid) > 0 and float(fut_valid.iloc[0]) > 0:
+                        val = float(fut_valid.iloc[0])
+                
+                # Eğer bulunamadıysa (örneğin Cuma kapanışı yfinance daily barda NaN ise), fast_info'ya bak
+                if val is None and target_date >= today_date - timedelta(days=4):
+                    try:
+                        tk = yf.Ticker(ticker)
+                        fi = getattr(tk, 'fast_info', None)
+                        if fi and 'lastPrice' in fi and fi['lastPrice'] and not pd.isna(fi['lastPrice']) and float(fi['lastPrice']) > 0:
+                            val = float(fi['lastPrice'])
+                    except Exception:
+                        pass
+                
+                # Fallback: ffill yapılmış tablodan al
+                if val is None:
+                    if target_ts in prices.index and not pd.isna(prices.loc[target_ts, ticker]) and float(prices.loc[target_ts, ticker]) > 0:
+                        val = float(prices.loc[target_ts, ticker])
+                    elif len(prices[prices.index >= target_ts]) > 0:
+                        val = float(prices[prices.index >= target_ts].iloc[0][ticker])
+
+            if val is not None:
+                end_prices[ticker] = val
+            else:
+                if DEBUG:
+                    print(f"[Actual] HATA: {ticker} için bitiş fiyatı bulunamadı")
+                return None
         
         # Portföy getirisi
         portfolio_return = 0
@@ -414,17 +438,31 @@ def get_portfolio_actual_breakdown(forecast_date, horizon_days, weights_dict):
                     start_prices[t] = start_dates[t] = None
         end_prices = {}
         end_dates = {}
+        today_date = datetime.now().date()
         for t in tickers:
-            if target_ts in prices.index:
+            if target_ts in prices.index and not pd.isna(prices.loc[target_ts, t]) and float(prices.loc[target_ts, t]) > 0:
                 end_prices[t] = float(prices.loc[target_ts, t])
                 end_dates[t] = target_ts
             else:
                 fut = prices[prices.index >= target_ts]
-                if len(fut) > 0:
-                    end_prices[t] = float(fut.iloc[0][t])
-                    end_dates[t] = fut.index[0]
-                else:
-                    end_prices[t] = end_dates[t] = None
+                val = None
+                dt = None
+                if len(fut) > 0 and t in fut:
+                    fut_v = fut[t].dropna()
+                    if len(fut_v) > 0 and float(fut_v.iloc[0]) > 0:
+                        val = float(fut_v.iloc[0])
+                        dt = fut_v.index[0]
+                if val is None and target_date >= today_date - timedelta(days=4):
+                    try:
+                        tk = yf.Ticker(t)
+                        fi = getattr(tk, 'fast_info', None)
+                        if fi and 'lastPrice' in fi and fi['lastPrice'] and not pd.isna(fi['lastPrice']) and float(fi['lastPrice']) > 0:
+                            val = float(fi['lastPrice'])
+                            dt = target_ts
+                    except Exception:
+                        pass
+                end_prices[t] = val
+                end_dates[t] = dt
         total_ret = 0.0
         total_weight = 0.0
         breakdown = []
@@ -637,9 +675,30 @@ def backfill_portfolio_performance(lookback_days=30):
                     # Bitis: target_date veya sonrasi ilk is gunu
                     end_mask = index_dates.values >= target_date
                     if not end_mask.any():
-                        end_idx = index_prices.iloc[-1]
+                        if target_date >= datetime.now().date() - timedelta(days=4):
+                            try:
+                                tk = yf.Ticker('XU030.IS')
+                                fi = getattr(tk, 'fast_info', None)
+                                if fi and 'lastPrice' in fi and fi['lastPrice'] and not pd.isna(fi['lastPrice']):
+                                    end_idx = float(fi['lastPrice'])
+                                else:
+                                    end_idx = index_prices.iloc[-1]
+                            except Exception:
+                                end_idx = index_prices.iloc[-1]
+                        else:
+                            end_idx = index_prices.iloc[-1]
                     else:
                         end_idx = index_prices.iloc[np.where(end_mask)[0][0]]
+                    
+                    if pd.isna(end_idx) or end_idx <= 0:
+                        try:
+                            tk = yf.Ticker('XU030.IS')
+                            fi = getattr(tk, 'fast_info', None)
+                            if fi and 'lastPrice' in fi and fi['lastPrice'] and not pd.isna(fi['lastPrice']):
+                                end_idx = float(fi['lastPrice'])
+                        except Exception:
+                            pass
+
                     benchmark_return = float((end_idx / start_idx) - 1)
                     if DEBUG:
                         print(f"[Backfill] Benchmark: {forecast_date} ({start_idx:.2f}) -> {target_date} ({end_idx:.2f}) = {benchmark_return:.4f}")
@@ -705,9 +764,30 @@ def get_benchmark_return(forecast_date, target_date, max_retries=3):
             start_idx = index_prices.iloc[np.where(start_mask)[0][-1]]
         end_mask = index_dates.values >= target_date
         if not end_mask.any():
-            end_idx = index_prices.iloc[-1]
+            if target_date >= datetime.now().date() - timedelta(days=4):
+                try:
+                    tk = yf.Ticker('XU030.IS')
+                    fi = getattr(tk, 'fast_info', None)
+                    if fi and 'lastPrice' in fi and fi['lastPrice'] and not pd.isna(fi['lastPrice']):
+                        end_idx = float(fi['lastPrice'])
+                    else:
+                        end_idx = index_prices.iloc[-1]
+                except Exception:
+                    end_idx = index_prices.iloc[-1]
+            else:
+                end_idx = index_prices.iloc[-1]
         else:
             end_idx = index_prices.iloc[np.where(end_mask)[0][0]]
+
+        if pd.isna(end_idx) or end_idx <= 0:
+            try:
+                tk = yf.Ticker('XU030.IS')
+                fi = getattr(tk, 'fast_info', None)
+                if fi and 'lastPrice' in fi and fi['lastPrice'] and not pd.isna(fi['lastPrice']):
+                    end_idx = float(fi['lastPrice'])
+            except Exception:
+                pass
+
         return float((end_idx / start_idx) - 1)
     except Exception:
         return None

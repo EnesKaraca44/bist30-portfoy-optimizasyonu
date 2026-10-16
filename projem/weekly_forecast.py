@@ -369,6 +369,30 @@ def run_weekly_forecast_job(use_lstm=False, force_refresh=False):
     print("[*] Haftalik Tahmin Isi Baslatiliyor...")
     print("=" * 60)
 
+    # 0. Önce geçmiş haftaların gerçekleşen getirilerini değerlendir ve karneleri güncelle
+    try:
+        print("[*] Gecmis tahminlerin gerceklesen performanslari kontrol ediliyor...")
+        from portfolio_performance_tracker import backfill_portfolio_performance
+        from performance_tracker import backfill_actuals_for_ticker
+        
+        updated_port = backfill_portfolio_performance(lookback_days=30)
+        if updated_port > 0:
+            print(f"[+] {updated_port} haftalik portfoy tahmini gerceklesen degerlerle guncellendi.")
+
+        conn_check = sqlite3.connect(DB_NAME)
+        c_check = conn_check.cursor()
+        c_check.execute("SELECT DISTINCT ticker FROM tahminler WHERE gerceklesen_getiri IS NULL")
+        pending_tickers = [row[0] for row in c_check.fetchall()]
+        conn_check.close()
+
+        updated_stocks = 0
+        for t in pending_tickers:
+            updated_stocks += backfill_actuals_for_ticker(t, horizon_days=5, lookback_days=30)
+        if updated_stocks > 0:
+            print(f"[+] {updated_stocks} bireysel hisse tahmini gerceklesen degerlerle guncellendi.")
+    except Exception as e:
+        print(f"[!] Gecmis tahminleri guncelleme hatasi: {e}")
+
     today = datetime.now()
     friday = today + timedelta(days=(4 - today.weekday()))
     
